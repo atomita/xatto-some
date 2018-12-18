@@ -1,12 +1,29 @@
-export function Some({ xa, ...attrs }, children) {
+import { x } from 'xatto'
+
+export const Some: any = ({ xa, ...props }, children) => {
   let vNode: any = null
 
-  children.some(child => {
-    vNode = 'function' === typeof child.name
-      ? child.name({ ...child.attributes, xa }, child.children)
-      : child
-    return vNode != null && vNode !== true && vNode !== false
-  })
+  xa.slice = ''
 
-  return vNode
+  const resolver = resolverProvider(xa)
+
+  if (children.some(child => {
+    vNode = resolver(child)
+    return isValid(vNode)
+  })) {
+    return vNode
+  }
+}
+
+function resolverProvider(xa) {
+  return vNode => {
+    if (x === vNode.name || !('function' === typeof vNode.name)) {
+      return vNode
+    }
+    return vNode.name({ ...vNode.props, xa }, vNode.children)
+  }
+}
+
+function isValid(vNode) {
+  return vNode != null && vNode !== true && vNode !== false
 }
