@@ -1,8 +1,13 @@
+/*
+xatto-some v1.0.0
+https://github.com/atomita/xatto-some
+Released under the MIT License.
+*/
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-    typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (factory((global['xatto-some'] = {})));
-}(this, (function (exports) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('xatto')) :
+    typeof define === 'function' && define.amd ? define(['exports', 'xatto'], factory) :
+    (factory((global['xatto-some'] = {}),global.xatto));
+}(this, (function (exports,xatto) { 'use strict';
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -40,16 +45,28 @@
         return t;
     }
 
-    function Some(_a, children) {
-        var xa = _a.xa, attrs = __rest(_a, ["xa"]);
+    var Some = function (_a, children) {
+        var xa = _a.xa, props = __rest(_a, ["xa"]);
         var vNode = null;
-        children.some(function (child) {
-            vNode = 'function' === typeof child.name
-                ? child.name(__assign({}, child.attributes, { xa: xa }), child.children)
-                : child;
-            return vNode != null && vNode !== true && vNode !== false;
-        });
-        return vNode;
+        xa.slice = '';
+        var resolver = resolverProvider(xa);
+        if (children.some(function (child) {
+            vNode = resolver(child);
+            return isValid(vNode);
+        })) {
+            return vNode;
+        }
+    };
+    function resolverProvider(xa) {
+        return function (vNode) {
+            if (xatto.x === vNode.name || !('function' === typeof vNode.name)) {
+                return vNode;
+            }
+            return vNode.name(__assign({}, vNode.props, { xa: xa }), vNode.children);
+        };
+    }
+    function isValid(vNode) {
+        return vNode != null && vNode !== true && vNode !== false;
     }
 
     exports.Some = Some;
