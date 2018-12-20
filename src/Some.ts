@@ -1,6 +1,6 @@
 import { x } from 'xatto'
 
-export const Some: any = ({ xa, ...props }, children) => {
+export function Some({ xa, ...props }: any, children) {
   let vNode: any = null
 
   xa.slice = ''
